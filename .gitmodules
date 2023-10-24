@@ -1,6 +1,9 @@
 [submodule "packager"]
 	path = packager
 	url = https://github.com/CarletonURocketry/packager.git
+	branch = main
+
 [submodule "fetcher"]
 	path = fetcher
 	url = https://github.com/CarletonURocketry/fetcher.git
+	branch = main
