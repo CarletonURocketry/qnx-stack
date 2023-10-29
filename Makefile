@@ -25,5 +25,8 @@ update:
 	git submodule update --recursive --remote
 
 # Rule for uploading binaries to the Raspberry Pi
-upload:
-	./deploy.sh $(BINARIES)
+deploy:
+ifeq ($(HOST),)
+	$(error Try using 'make deploy HOST=<host>')
+endif
+	./deploy.sh -h $(HOST) $(BINARIES)
