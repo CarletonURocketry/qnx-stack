@@ -29,4 +29,9 @@ deploy:
 ifeq ($(HOST),)
 	$(error Try using 'make deploy HOST=<host>')
 endif
+
+ifeq ($(OS),Windows_NT)
+	deploy.bat $(HOST) $(BINARIES)
+else
 	./deploy.sh -h $(HOST) $(BINARIES)
+endif
