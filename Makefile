@@ -22,6 +22,7 @@ clean:
 
 # Updates all sub modules recursively
 update:
+	git pull
 	git submodule update --recursive --remote
 
 # Rule for uploading binaries to the Raspberry Pi
