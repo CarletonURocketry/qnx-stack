@@ -1,4 +1,4 @@
-MODULES = fetcher packager
+MODULES = fetcher packager broadcaster
 MODULE_PATHS = $(foreach module,$(MODULES),$(abspath $(module)))
 PI_ARCH = nto-aarch64-o.le
 BINARIES = $(foreach module,$(MODULES),$(abspath $(module))/$(PI_ARCH)/$(module))

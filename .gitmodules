@@ -7,3 +7,6 @@
 	path = fetcher
 	url = https://github.com/CarletonURocketry/fetcher.git
 	branch = main
+[submodule "broadcaster"]
+	path = broadcaster
+	url = https://github.com/CarletonURocketry/broadcaster.git
