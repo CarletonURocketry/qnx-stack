@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 usage() { echo "Usage: $0 [-u username] -h host" 1>&2; exit 1; }
 
