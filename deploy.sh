@@ -1,6 +1,6 @@
 #!/bin/bash
 
-usage() { echo "Usage: $0 [-u username] -h host" 1>&2; exit 1; }
+usage() { echo "Usage: $0 [-u username] [-p port] -h host" 1>&2; exit 1; }
 
 while getopts "uh:" opt; do
     case "${opt}" in
@@ -9,6 +9,9 @@ while getopts "uh:" opt; do
             ;;
         h)
             host=${OPTARG}
+            ;;
+        p)
+            port=${OPTARG}
             ;;
         *)
             usage
@@ -28,6 +31,11 @@ fi
 # If no username was given then use root
 if [ -z "${username}" ]; then
     username=root
+fi
+
+# If no port was given use 22
+if [ -z "${port}" ]; then
+    port=22
 fi
 
 pi_addr=$username@$host
