@@ -1,0 +1,45 @@
+\documentclass[12pt]{article}
+\usepackage[letterpaper, margin=1in]{geometry}
+\usepackage[acronym]{glossaries}
+\usepackage[automake]{glossaries-extra}
+\usepackage{graphicx}
+\usepackage{float}
+
+% Document font setup %
+\usepackage{charter}
+
+% TITLE PAGE INFORMATION %
+\title{Carleton University InSpace On-Board Telemetry System Design}
+\author{Matteo Golin}
+\date{
+    November 19, 2023 \\
+    Modified: \today
+}
+
+% GLOSSARY %
+\input{./sections/glossary.tex}
+\makeglossaries
+
+% MAIN DOCUMENT %
+\begin{document}
+
+% TITLE %
+\maketitle
+\pagebreak
+
+% TABLE OF CONTENTS %
+\tableofcontents
+\pagebreak
+
+% OVERVIEW %
+\input{./sections/overview.tex}
+
+% TECHNICAL ARCHITECTURE %
+\input{./sections/technical_architecture.tex}
+
+% GLOSSARY %
+\pagebreak
+\printglossary[type=\acronymtype,title=Acronyms]
+\printglossary[title=Glossary]
+
+\end{document}
