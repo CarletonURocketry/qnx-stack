@@ -14,9 +14,16 @@
 % Document font setup %
 \usepackage{charter}
 
+% Remove paragraph indentation and use newline to separate instead. %
+\usepackage[parfill]{parskip}
+\setlength{\parindent}{0cm}
+
 % TITLE PAGE INFORMATION %
 \title{Carleton University InSpace On-Board Telemetry System Design}
-\author{Matteo Golin}
+\author{
+    Matteo Golin \\
+    Angus Jull
+}
 \date{
     November 19, 2023 \\
     Modified: \today
@@ -40,6 +47,9 @@
 % OVERVIEW %
 \input{./sections/overview.tex}
 
+% PREVIOUS SYSTEM DESCRIPTION %
+\input{sections/previous_system.tex}
+
 % TECHNICAL ARCHITECTURE %
 \input{./sections/technical_architecture.tex}
 
@@ -54,5 +64,9 @@
 % BIBLIOGRAPHY %
 \pagebreak
 \printbibliography
+
+% APPENDIX %
+\pagebreak
+\input{sections/appendix.tex}
 
 \end{document}
