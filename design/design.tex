@@ -1,9 +1,15 @@
 \documentclass[12pt]{article}
 \usepackage[letterpaper, margin=1in]{geometry}
+
 \usepackage[acronym]{glossaries}
 \usepackage[automake]{glossaries-extra}
+
+\usepackage[style=ieee]{biblatex}
+\addbibresource{references.bib}
+
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{hyperref}
 
 % Document font setup %
 \usepackage{charter}
@@ -37,9 +43,16 @@
 % TECHNICAL ARCHITECTURE %
 \input{./sections/technical_architecture.tex}
 
+% TESTABILITY AND MAINTENANCE %
+\input{./sections/testability.tex}
+
 % GLOSSARY %
 \pagebreak
-\printglossary[type=\acronymtype,title=Acronyms]
 \printglossary[title=Glossary]
+\printglossary[type=\acronymtype,title=Acronyms]
+
+% BIBLIOGRAPHY %
+\pagebreak
+\printbibliography
 
 \end{document}

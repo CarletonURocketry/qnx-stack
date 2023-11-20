@@ -1,0 +1,93 @@
+\section{Testability and Maintenance}
+
+The \glsxtrshort{cuinspace} telemetry system must be continuously tested in order to prevent unexpected malfunction
+during flight. The previous design lacked thorough testing, which led to it never working during flight.
+
+The telemetry system must also be highly maintainable for future members. Because \glsxtrshort{cuinspace} is an
+undergraduate design team, we experience a high turnover in members due to undergraduate programs being only 4-5 years
+in duration. New members, including those who lack previous knowledge of the system, should be able to familiarize
+themselves with modules quickly in order to contribute as early in the academic year as possible. This will need to be
+facilitated with readable code, good documentation and proper separation of responsibility/low coupling within and
+between modules.
+
+\subsection{Development Methodology}
+
+Development on the telemetry system will follow a \gls{vmodel} methodology, with elements of \gls{agile}.
+
+\Gls{agile} is an ideal approach for the \glsxtrshort{cuinspace} telemetry system because of the nature of development work
+on an undergraduate design team. Members meet twice per week for 2 hours, where they complete as much development as
+possible. Most members do not contribute outside of these meeting times (or do so infrequently) due to their course
+load. Additionally, prototypes must be available frequently throughout the year to test integration with other
+components in development (such as the \glsxtrshort{srad} sensor board) and to present designs to industry
+professionals, faculty and amateur rocketry competition organizers several times throughout the academic year. The
+limited timeline for deliverables and requirement for available prototypes throughout the software life cycle makes
+\gls{agile} an ideal choice.
+
+Additionally, \gls{agile} includes instructions for how development should be carried out which integrates nicely with
+the characteristics of a student design team. \Gls{agile} requests that every day of a sprint be led with a
+\gls{standup}, which gives developers a chance to update others on their progress and address concerns. Members of the
+\glsxtrshort{cuinspace} rocketry design team, especially those early in their undergraduate, become stuck on
+development tasks because they lack the experience necessary to tackle them on their own. The \gls{standup} provides an
+opportunity for members to request help on tasks they are stuck on from other members or executive leaders. Their
+progress updates are also helpful for maintaining an up-to-date development timeline, which is critical due to the
+short delivery times for software during the academic year.
+
+The \gls{vmodel} also provides some inspiration for the development methodology of the telemetry system, as frequent
+testing and prototyping is a hard requirement. The failure of \glsxtrshort{cuinspace}'s telemetry system in previous
+years was a lack of continuous testing. This oversight led to a discovery of problems in range testing, which was never
+solved and meant that no live telemetry data could be sent during flight. Utilizing the \gls{vmodel} will require the
+telemetry system to have frequent prototypes used in testing, which will catch errors earlier in the development cycle.
+
+In addition to frequent testing, the \gls{vmodel} also prescribes requirements and architecture design to be completed
+before implementation. Although this contradicts with the \gls{agile} methodology and the nature of development on a
+student design team, \glsxtrshort{cuinspace} plans to use this attribute of the \gls{vmodel} to encourage more detailed
+design plans as early as possible in the year, before implementation is allowed to progress too far. Having a clearer
+plan before implementation starts gives members clearer direction with their tasks and reduces the probability of
+having design incompatibilities after implementations are complete, requiring large, last-minute changes.
+
+\subsection{Maintainability}
+
+The \glsxtrshort{cuinspace} telemetry system software must be easily maintainable throughout high turnover of members
+and an influx of interested members with limited software development knowledge. This is achieved with detailed
+documentation, enforced software standards and division of responsibility between and within the software modules
+discussed in Section \ref{s:tech-arch}.
+
+\subsubsection{Documentation}
+
+In order to maintain and enforce detailed documentation of the telemetry system, auto-documentation generation using
+\href{https://www.doxygen.nl/index.html}{Doxygen} is enforced.
+
+All of the software modules use a Doxygen configuration file which outputs warnings when code structures are left
+undocumented (functions, C structs, enums, etc.). Doxygen documentation generation is automatically triggered when a
+\glsxtrshort{pr} is merged into the module's respective codebase. This ensures that the documentation is always up to
+date with the codebase.
+
+In addition to automatic documentation generation on merges, software module GitHub repositories are set up to host the
+static \glsxtrshort{html} website created by Doxygen using \gls{githubpages}. This allows developers to easily peruse
+existing documentation without requiring them to download it themselves or render the web-pages locally.
+
+Doxygen documentation will be enforced using the \href{https://www.doxygen.nl/manual/docblocks.html#cppblock}{JavaDoc}
+style. This style was selected because of its simple syntax, wide selection of information tags and because it is
+taught in second year undergraduate engineering courses covering Java programming.
+
+Documentation is required to be written wherever implementation occurs (C files for functions, header files for type
+definitions, etc.). This avoids rebuilding all dependent source files when the documentation for a function prototype
+is changed in a header file. \cite{doxygen-headers}
+
+\subsubsection{Code Style}
+
+All code is formatted according to a uniform \href{https://clang.llvm.org/docs/ClangFormat.html}{clang-format}
+configuration. This ensures that code formatting remains readable, and it also ensures that merge conflicts due to
+developer formatting differences are avoided. Formatting is enforced via an automatic action on GitHub which checks
+that the format adheres to the guidelines before a \glsxtrshort{pr} can be merged.
+
+A comprehensive set of compiler warnings is included in the build system for the telemetry software, which ensures that
+common mistakes are caught at compile time (incorrect number of arguments to printf, unused declarations, etc.). This
+ensures that code style is kept clean and free of bad practices. Warnings will be visible to developers whenever they
+compile.
+
+All code will be linted using the \gls{qnx} compiler, qcc. This will ensure that compiler warnings are detected before
+\glsxtrshort{pr}s are merged, giving developers the ability to fix their code before it becomes part of the final
+product.
+
+\subsection{Testing}
