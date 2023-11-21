@@ -7,7 +7,7 @@ high turnover in members due to undergraduate programs being 4-5 years in durati
 lack previous knowledge of the system, should be able to familiarize themselves with modules quickly in order to
 contribute as early in the academic year as possible with minimal supervision. This will need to be facilitated with
 readable code, good documentation and proper separation of responsibility/low coupling within and between the modules
-mentioned in section \ref{s:modules}.
+mentioned in \hyperref[s:modules]{section \ref{s:modules}}.
 
 \subsection{Development Methodology}
 
@@ -62,12 +62,12 @@ having design incompatibilities after implementation is complete, requiring larg
 The \glsxtrshort{cuinspace} telemetry system software must be easily maintainable throughout high turnover of members
 and an influx of interested members with limited software development knowledge. This is achieved with detailed
 documentation, enforced software standards and division of responsibility between and within the software modules
-discussed in section \ref{s:modules}.
+discussed in \hyperref[s:modules]{section \ref{s:modules}}.
 
 \subsubsection{Documentation}
 
 In order to maintain and enforce detailed documentation of the telemetry system, auto-documentation generation using
-Doxygen (\ref{a:doxygen}) is enforced.
+Doxygen is enforced. See \hyperref[a:doxygen]{appendix \ref{a:doxygen}} for more information about Doxygen.
 
 All of the software modules use a Doxygen configuration file which outputs warnings when code structures are left
 undocumented (functions, C structs, enums, etc.). Doxygen documentation generation is automatically triggered when a
@@ -79,16 +79,17 @@ set up to host the static \glsxtrshort{html} website created by Doxygen using \g
 to easily peruse existing documentation without requiring them to download it themselves or render the web-pages
 locally.
 
-Doxygen documentation is enforced using the JavaDoc (\ref{a:javadoc}) style. This style was selected because of its
-simple syntax, wide selection of information tags and because it is taught in second year undergraduate engineering
-courses covering Java programming.
+Doxygen documentation is enforced using the \hyperref[a:javadoc]{JavaDoc style (more information in appendix
+    \ref{a:javadoc})}. This style was selected because of its simple syntax, wide selection of information tags and because
+it is taught in second year undergraduate engineering courses covering Java programming.
 
 Documentation is required to be written wherever implementation occurs (C files for functions, header files for type
 definitions, etc.). This avoids rebuilding all dependent source files when the documentation for a function prototype
 is changed in a header file. \cite{doxygen-headers}
 
-In addition to inline documentation for code, all modules mentioned in section \ref{s:modules} will come bundled with a
-help text document which can be invoked in the console with the \texttt{use} command. The help document will include:
+In addition to inline documentation for code, all modules mentioned in \hyperref[s:modules]{section \ref{s:modules}}
+will come bundled with a help text document which can be invoked in the console with the \texttt{use} command. The help
+document will include:
 
 \begin{itemize}
     \setlength{\itemsep}{1pt}
@@ -102,10 +103,10 @@ help text document which can be invoked in the console with the \texttt{use} com
 
 \subsubsection{Code Style}
 
-All code is formatted according to a uniform clang-format (\ref{a:clang-format}) configuration. This ensures that code
-formatting remains readable, and it also ensures that merge conflicts due to developer formatting differences are
-avoided. Formatting is enforced via an automatic action on GitHub which checks that the code adheres to the formatting
-guidelines before a \glsxtrshort{pr} can be merged.
+All code is formatted according to a uniform \hyperref[a:clang-format]{clang-format (see appendix \ref{a:clang-format})
+    for more information} configuration. This ensures that code formatting remains readable, and it also ensures that merge
+conflicts due to developer formatting differences are avoided. Formatting is enforced via an automatic action on GitHub
+which checks that the code adheres to the formatting guidelines before a \glsxtrshort{pr} can be merged.
 
 A comprehensive set of compiler warnings is included in the build system for the telemetry software, which ensures that
 common mistakes are caught at compile time (incorrect number of arguments to \texttt{printf}, unused declarations,

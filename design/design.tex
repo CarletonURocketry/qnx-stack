@@ -7,9 +7,20 @@
 \usepackage[style=ieee]{biblatex}
 \addbibresource{./references.bib}
 
-\usepackage{graphicx}
-\usepackage{float}
-\usepackage{hyperref}
+\usepackage{graphicx} % Include graphics %
+\usepackage{float} % Make sure that figures stay where they're defined %
+
+% Ensure consistency between displayed PDF title and PDF viewer title %
+\def\doctitle{Carleton University InSpace On-Board Telemetry System Design}
+
+% Links %
+\usepackage[
+    pdftitle={\doctitle},
+    colorlinks=false,
+    allbordercolors={0 0 0},
+    citebordercolor={1 1 1}, % No border for citations %
+    pdfborderstyle={/S/U/W 1},
+]{hyperref}
 
 % Document font setup %
 \usepackage{charter}
@@ -19,7 +30,7 @@
 \setlength{\parindent}{0cm}
 
 % TITLE PAGE INFORMATION %
-\title{Carleton University InSpace On-Board Telemetry System Design}
+\title{\doctitle}
 \author{
     Matteo Golin \\
     Angus Jull
@@ -41,7 +52,12 @@
 \pagebreak
 
 % TABLE OF CONTENTS %
-\tableofcontents
+{
+    % No link styling in table of contents %
+    \hypersetup{hidelinks}
+    \tableofcontents
+    \listoffigures
+}
 \pagebreak
 
 % OVERVIEW %

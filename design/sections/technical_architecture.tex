@@ -18,9 +18,12 @@ The architecture for the \glsxtrshort{cuinspace} telemetry system is separated i
 \begin{enumerate}
     \setlength{\itemsep}{1pt}
     \setlength{\parskip}{0pt} \setlength{\parsep}{0pt}
-    \item Critical functionality for the 2023-2024 telemetry system (Figure \ref{fig:crit-arc})
-    \item Non-critical functionality which can be postponed to 2024-2025 (Figure \ref{fig:non-crit-arc})
+    \item Critical functionality \hyperref[fig:crit-arc]{(Figure \ref{fig:crit-arc})}
+    \item Non-critical functionality \hyperref[fig:non-crit-arc]{(Figure \ref{fig:non-crit-arc})}
 \end{enumerate}
+
+Critical functionality is required for a functional telemetry system in the 2023-2024 academic year. Non-critical
+functionality can be postponed until the 2024-2025 academic year.
 
 \begin{figure}[H]
     \includegraphics[width=\linewidth]{assets/critical-architecture.png}
@@ -72,49 +75,58 @@ interfaces).
 
 The \texttt{controller} module is responsible for receiving control commands from the ground station over
 \glsxtrshort{lora} and providing them to \texttt{fetcher} for interpretation. The \glsxtrshort{cuinspace} packet format
-specification (\ref{a:telem-format}) describes control packets which allow the ground station to request only specific
-types of telemetry data from the rocket telemetry system. The \texttt{controller} module will read these control
+specification describes control packets which allow the ground station to request only specific types of telemetry data
+from the rocket telemetry system. \cite{telemetry-format} The \texttt{controller} module will read these control
 packets from the \glsxtrshort{lora} RN2483 chip and provide them as plain-text instructions to the \texttt{fetcher}
 module.
 
-The \texttt{controller} module will also be able to provide signal reports and check the \glsxtrshort{lora} radio
-settings. It may later be required to take input from an interactive terminal interface so that the telemetry system
-can be monitored by developers. The module will also have the ability to modify radio parameters in accordance with the
-control packets it receives from the ground station.
+The \texttt{controller} module will also be able to generate signal reports and report the \glsxtrshort{lora} radio
+settings for diagnostic information. It may later be modified to additionally take input from an interactive terminal
+interface so that the telemetry system can be monitored and controlled by developers during testing, or via SSH from
+the launch pad. The module will also have the ability to modify radio parameters in accordance with the control packets
+it receives from the ground station.
 
 \subsubsection{Fetcher}
 
-The \texttt{fetcher} module is responsible for perpetually reading sensor data. It does so by reading data from all the
-sensors on the \glsxtrshort{cuinspace} \glsxtrshort{srad} sensor board via an \glsxtrshort{i2c} bus.
+The \texttt{fetcher} module is responsible for perpetually reading sensor data. It does so by repeatedly polling for
+data from all the sensors on the \glsxtrshort{cuinspace} \glsxtrshort{srad} sensor board via an \glsxtrshort{i2c} bus.
 
-The \texttt{fetcher} module will output sensor data in plain-text, human readable measurements via
-\texttt{\gls{stdout}}. Outputted sensor data will be annotated with its data type (altitude, temperature, etc.) and
-unit of measurement.
+The \texttt{fetcher} module will output sensor data in plain-text over \texttt{\gls{stdout}} so that it can be used as
+a standalone module. Outputted sensor data will be annotated with its data type (altitude, temperature, etc.) and unit
+of measurement (metres, degrees Celsius, etc.).
 
-The \texttt{fetcher} module will be able to receive instructions about which sensor data to prioritize via
-\texttt{\gls{stdin}}. It will also be able to accept a configuration which specifies sensor addresses, sensor data
-types (altitude, temperature, etc.) and commands for reading from the sensors in order to be configurable for different
-\glsxtrshort{srad} sensor boards. \textbf{This functionality is not part of the critical requirements for the 2023-2024
-    telemetry system}.
+The \texttt{fetcher} module will be able to receive instructions to prioritize certain sensor data via
+\texttt{\gls{stdin}}. It will also be able to accept configuration which specifies sensor addresses, sensor data types
+(altitude, temperature, etc.) and commands for reading from the sensors in order to be configurable for different
+\glsxtrshort{srad} sensor boards. This configuration may be provided via a configuration file or command line
+arguments. It is possible that sensor board hardware will be developed to include an \glsxtrfull{eeprom} on the
+\glsxtrshort{i2c} bus containing this configuration information. \textbf{This functionality is not part of the critical
+    requirements for the 2023-2024 telemetry system}.
 
 \subsubsection{Packager}
 
 The \texttt{packager} module is responsible for packaging sensor data into the \glsxtrshort{cuinspace} telemetry packet
-format. It requires an HAM radio call sign provided via command line in order to sign all the packets that it creates.
-\texttt{packager} will write the encoded radio packets to \texttt{\gls{stdout}} in plain-text hexadecimal digits.
+format. It requires an \gls{ham-radio} call sign provided via command line in order to sign all the packets that it
+creates, as well as plain-text sensor data provided over \texttt{\gls{stdin}} or via a file. \texttt{packager} will
+write the encoded radio packets to \texttt{\gls{stdout}} in plain-text hexadecimal digits.
 
 \subsubsection{Broadcaster}
 
 The \texttt{broadcaster} module is responsible for interfacing with the \glsxtrshort{lora} RN2483 radio chip over
-\glsxtrshort{uart} to broadcast messages to the ground station. It accepts input in the form of plain-text hexadecimal
+\glsxtrshort{uart} to broadcast packets to the ground station. It accepts input in the form of plain-text hexadecimal
 digits over \texttt{\gls{stdin}} (or a file), which it sends to the radio chip for transmission. Newline characters in
-the input signify the end of a transmission. \texttt{broadcaster} will also accept command line options for all of the
-configurable radio parameters provided by the RN2483 radio chip, which it will use for transmission.
+the input signify the end of a packet. \texttt{broadcaster} will also accept command line options for all of the
+configurable radio parameters provided by the RN2483 chip, which it will use for transmission.
 
 \subsubsection{Writer}
 
 The \texttt{writer} module is responsible for writing \glsxtrshort{cuinspace} telemetry packets to an SD card using the
-\glsxtrshort{cuinspace} SD card storage format.
+\glsxtrshort{cuinspace} SD card storage format. The SD storage format uses the packet format in its entirety, but adds
+some additional information for locating data from different flights. \cite{sd-format}
+
+\texttt{writer} will also accept its input in the form of plain-text hexadecimal digits, either via \texttt{\gls{stdin}}
+or a file. The input to writer must be valid \glsxtrshort{cuinspace} packets, which is its primary difference from
+\texttt{broadcaster}. This is because packet data plays a role in generating the SD card format.
 
 \subsection{Build System}
 

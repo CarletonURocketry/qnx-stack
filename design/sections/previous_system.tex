@@ -4,27 +4,35 @@ The main differences and similarities between the previous and current telemetry
 
 \subsection{Previous System}
 
-The previous \glsxtrshort{cuinspace} telemetry system (\ref{a:prev-system}) incorporates several \glsxtrshort{srad}
+The \hyperref[a:prev-system]{previous \glsxtrshort{cuinspace} telemetry system} incorporates several \glsxtrshort{srad}
 \glsxtrshortpl{pcb}, including a radio board using the \glsxtrshort{lora} RN2483 chip and a sensor board using
 \glsxtrshort{i2c}. The telemetry system software runs on a custom \glsxtrshort{pcb} using an \glsxtrfull{arm} Cortex
-M0+ flash microcontroller. Uploading to the \glsxtrshort{arm} chip requires the use of a SEGGER J-Link mini
-(\ref{a:jlink}) and a build system based around the \gls{gnu} C compiler \textit{gcc}, the \gls{gnu} debugger
-\textit{gdb} and OpenOCD (\ref{a:openocd}).
+M0+ flash microcontroller. Uploading binaries to the \glsxtrshort{arm} chip requires the use of a
+\hyperref[a:jlink]{SEGGER J-Link mini} and a build system based around the \gls{gnu} C compiler \texttt{gcc}, the
+\gls{gnu} debugger \texttt{gdb} and \hyperref[a:openocd]{OpenOCD}.
 
 The telemetry system is fully embedded and composed of multiple custom drivers and control routines for sensors, SD
-cards, \glsxtrfull{uart} devices and \glsxtrshort{i2c} communication. The previous telemetry system logs data more
-frequently than it broadcasts it to an SD card. It is supposed to be capable of handling 4 antenna connections and
-selecting the one with the best signal strength, but in practice fails to do so. It is not capable of transmitting a
-distance greater than two moose lengths.
+cards, \glsxtrfull{uart} devices and \glsxtrshort{i2c} communication. It is supposed to be capable of handling 4
+antenna connections by selecting the one with the best signal strength for transmission, but in practice fails to do
+so. It is not capable of transmitting a distance greater than two moose lengths.
+
+The previous system was almost fully designed (both hardware and software) by a previous member of
+\glsxtrshort{cuinspace}, who has since graduated. Due to the solo nature of his work, there was little knowledge
+transfer between members. The system itself is difficult to understand due to a lack of documentation.
 
 \subsection{Current System}
 
-The current system (\ref{a:cur-system}) still uses the \glsxtrshort{srad} \glsxtrshortpl{pcb} from the
-previous system, however it eliminates the use of the \glsxtrshort{arm} microcontroller in favour of a Raspberry Pi 4
-Model B (\ref{a:rpi4}). This switch was made to facilitate the software development process. The Raspberry Pi running
-\gls{qnx} allows the use of \glsxtrfull{ssh} tools over both wireless and Ethernet connections, allowing students to
-test software from any location.
+The \hyperref[a:cur-system]{current system} still uses the \glsxtrshort{srad} \glsxtrshortpl{pcb} from the previous
+system, however it eliminates the use of the \glsxtrshort{arm} microcontroller in favour of a
+\hyperref[a:rpi4]{Raspberry Pi 4 Model B}. This switch was made to facilitate the software development process. The
+Raspberry Pi running \gls{qnx} allows the use of \glsxtrfull{ssh} tools over both wireless and Ethernet connections,
+allowing students to test software from any location.
 
 \Glsxtrshort{i2c} and \glsxtrshort{uart} communication will be performed using the Raspberry Pi's \glsxtrfull{gpio} pins
 over a ribbon cable connected to the \glsxtrshort{srad} boards. Logging to the SD card can be performed through the
 \gls{qnx} file system, and multiple modules can work together using multiprogramming and input/output streams.
+
+The current telemetry system is being worked on by several members in collaboration, with enforced software standards
+and documentation requirements. There are also more specifications available for all decisions made throughout the
+year, and development guides, benefiting new members who need a high-level understanding of the system to start
+contributing.
