@@ -1,0 +1,26 @@
+name: Build LaTeX design document
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+jobs:
+  build_latex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v3
+
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@v3
+        with:
+          work_in_root_file_dir: true
+          root_file: ./design/design.tex
+
+      - name: Upload documents
+        uses: actions/upload-artifact@v3
+        with:
+          name: Carleton University InSpace On-Board Telemetry System Design
+          path: ./design/design.pdf

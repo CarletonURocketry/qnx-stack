@@ -1,3 +1,7 @@
+# Final copies (generation done automatically)
+*.pdf
+
+# Garbage generated files
 *.acn
 *.log
 *.glg
@@ -8,7 +12,6 @@
 *.glo
 *.gls
 *.ist
-*.pdf
 *.synctex.gz
 *.fls
 *.toc
