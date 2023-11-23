@@ -1,0 +1,65 @@
+\appendix
+
+\section{Carleton University InSpace Repositories}
+
+\subsection{Hardware Design}
+
+Previous year's hardware designs are publicly available in the
+\href{https://github.com/CarletonURocketry/avionics-hardware}{CarletonURocketry avionics-hardware} repository. This
+repository may not contain the most currently available hardware designs, but they may be provided upon request.
+
+\subsection{Telemetry Systems}
+
+\subsubsection{Telemetry Format Specifications} \label{a:telem-format}
+
+All telemetry formatting and encoding specifications, including radio packet format and SD card logging formats, are
+visible in the \href{https://github.com/CarletonURocketry/telemetry-format}{CarletonURocketry telemetry-format
+    repository}.
+
+\subsubsection{Current Telemetry System} \label{a:cur-system}
+
+All the modules described in this document, their source files, the testing framework and the source files for this
+document itself is available in the \href{https://github.com/CarletonURocketry/qnx-stack}{CarletonURocketry qnx-stack
+    repository}.
+
+\subsubsection{Previous Telemetry System} \label{a:prev-system}
+
+The repository for the previously used telemetry system is available in the
+\href{https://github.com/CarletonURocketry/avionics-software}{CarletonURocketry avionics-software repository}, which is
+now available as a public archive.
+
+\subsubsection{Ground Station System} \label{a:ground-station}
+
+The repositories for the ground station system are available below. The ground station repository contains the backend
+system for interfacing with the \glsxtrshort{srad} ground station board over serial and decoding radio packets into
+human-readable data. The ground station UI repository contains the frontend dashboard used to visualize the telemetry
+data in real-time. The two connect over a websocket connection.
+
+\begin{itemize}
+    \setlength{\itemsep}{1pt}
+    \setlength{\parskip}{0pt} \setlength{\parsep}{0pt}
+    \item \href{https://github.com/CarletonURocketry/ground-station}{Ground Station}
+    \item \href{https://github.com/CarletonURocketry/ground-station-ui}{Ground Station UI}
+\end{itemize}
+
+\section{Referenced Tools and Technologies}
+
+\subsection{Hardware}
+
+\begin{itemize}
+    \setlength{\itemsep}{1pt}
+    \setlength{\parskip}{0pt} \setlength{\parsep}{0pt}
+    \item \href{https://www.raspberrypi.com/products/raspberry-pi-4-model-b/}{Raspberry Pi 4 Model B} \label{a:rpi4}
+    \item \href{https://www.segger.com/downloads/jlink/}{SEGGER J-Link} \label{a:jlink}
+\end{itemize}
+
+\subsection{Software}
+
+\begin{itemize}
+    \setlength{\itemsep}{1pt}
+    \setlength{\parskip}{0pt} \setlength{\parsep}{0pt}
+    \item \href{https://www.doxygen.nl/index.html}{Doxygen} \label{a:doxygen}
+    \item \href{https://www.doxygen.nl/manual/docblocks.html#cppblock}{JavaDoc} \label{a:javadoc}
+    \item \href{https://www.segger.com/downloads/jlink/}{OpenOCD}. \label{a:openocd}
+    \item \href{https://clang.llvm.org/docs/ClangFormat.html}{clang-format} \label{a:clang-format}
+\end{itemize}

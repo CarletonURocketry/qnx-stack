@@ -1,0 +1,26 @@
+\section{Overview}
+
+This document covers the design of the \glsxtrfull{cuinspace} on-board telemetry system.
+
+\subsection{Scope}
+
+The telemetry system uses \gls{qnx}'s \glsxtrfull{rtos} and modular processes in order to achieve the goal of
+transmitting sensor data collected from an \glsxtrfull{srad} sensor board over \glsxtrfull{lora} radio to
+\glsxtrshort{cuinspace}'s \glsxtrshort{srad} \hyperref[a:ground-station]{ground station}. The telemetry system is not
+intended to replace the \glsxtrfull{cots} \glsxtrfull{gps} and altimeter system. It is a soft real-time system.
+
+\subsection{Context}
+
+The \glsxtrshort{cuinspace} telemetry system design must maintain compatibility with the existing ground station
+software and telemetry packet format specification. It must use \glsxtrshort{lora} radio to communicate telemetry
+packets to be consistent with previous designs.
+
+The telemetry system must also be able to read sensor data from \glsxtrshort{srad} sensor boards of different layouts
+using \glsxtrfull{i2c}. It must complete all these responsibilities while being as conservative as possible in power
+usage so as to preserve enough battery life for flight while idling on the launch pad.
+
+Another important consideration of this system is maintainability. The system must be well documented, easily
+extensible and maintainable. It must be approachable for new \glsxtrshort{cuinspace} members so that developers are
+able to complete new features and tasks in a reasonable amount of time regardless of initial software development
+knowledge or progress in their undergraduate degree. This is critical due to the high turnover experienced by the
+student design team.

@@ -1,0 +1,25 @@
+# Final copies (generation done automatically)
+*.pdf
+
+# Garbage generated files
+*.acn
+*.log
+*.glg
+*.aux
+*.alg
+*.acr
+*.acn
+*.glo
+*.gls
+*.ist
+*.synctex.gz
+*.fls
+*.toc
+*.fdb_latexmk
+*.glsdefs
+*.bcf
+*.run.xml
+*.bbl
+*.blg
+*.out
+*.lof
