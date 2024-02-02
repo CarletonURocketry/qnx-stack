@@ -1,0 +1,14 @@
+scanner v0.0.0
+Copyright (C) 2023 Carleton University InSpace Rocketry Design Team
+
+This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you
+are welcome to redistribute it under certain conditions. Please see the GNUGPLv3
+license for more details: https://www.gnu.org/licenses/
+
+DESCRIPTION:
+    A command line utility for scanning the I2C bus.
+
+SYNTAX:
+    i2c-scanner [i2c bus]
+
+OPTIONS:

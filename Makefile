@@ -1,13 +1,15 @@
 MODULES = fetcher packager broadcaster
 MODULE_PATHS = $(foreach module,$(MODULES),$(abspath $(module)))
 PI_ARCH = nto-aarch64-o.le
-BINARIES = $(foreach module,$(MODULES),$(abspath $(module))/$(PI_ARCH)/$(module))
+UTILITIES = i2c-scanner
+BINARIES = $(foreach module,$(MODULES) $(UTILITIES),$(abspath $(module))/$(PI_ARCH)/$(module))
 
 # Port is optional but will be 22 by default
 deploy: PORT = 22
 
 # Modules should not be treated as having dependencies
 .PHONY: $(MODULES)
+.PHONY: $(UTILITIES)
 
 # Calls Makefile for the specific project
 $(MODULES):
@@ -17,6 +19,10 @@ $(MODULES):
 # Compiles all binaries
 all: $(MODULES)
 	$(info All modules built!)
+
+$(UTILITIES):
+	$(info Building $@)
+	$(MAKE) all -C $(abspath $@)
 
 # Cleans all binaries
 clean:
