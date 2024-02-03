@@ -71,7 +71,37 @@ int main(int argc, char **argv) {
 
     // Read mode
     if (file_path == NULL) {
-        printf("READ MODE\n");
+        // Dummy write to start from address 0
+        i2c_send_t dummy_header = {
+            .stop = 0,
+            .len = 1,
+            .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eewrite(EEPROM_ADDR)},
+        };
+        uint8_t dummy_write[sizeof(dummy_header) + 1];
+        memcpy(dummy_write, &dummy_header, sizeof(dummy_header));
+        dummy_write[sizeof(dummy_header)] = 0x0; // Address 0
+        if (devctl(bus, DCMD_I2C_SEND, dummy_write, sizeof(dummy_write), NULL) != EOK) {
+            fprintf(stderr, "Failed to send dummy write.\n");
+            exit(EXIT_FAILURE);
+        }
+
+        // Start sequential read
+        i2c_sendrecv_t read_header = {
+            .stop = 1,
+            .send_len = 0,
+            .recv_len = 1,
+            .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eeread(EEPROM_ADDR)},
+        };
+        uint8_t buffer[sizeof(read_header) + 1];
+        memcpy(buffer, &read_header, sizeof(read_header));
+        errno_t error = devctl(bus, DCMD_I2C_SENDRECV, buffer, sizeof(buffer), NULL);
+        if (error != EOK) {
+            fprintf(stderr, "Failed to initiate sequential read with error: %s\n", strerror(error));
+            exit(EXIT_FAILURE);
+        }
+        printf("%c", buffer[sizeof(read_header)]);
+        putchar('\n');
+
         return 0;
     }
 

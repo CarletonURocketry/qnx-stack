@@ -1,8 +1,0 @@
-STATE=Desktop
-INSTALLDIR=aarch64le/bin/
-INSTALLNAME=eeprom-write
-NAME=eeprom-write
-USER=golin
-HOST=Linguini
-DATE=2024/02/03-15:30:51-EST
-DESCRIPTION=CUInSpace eeprom-write
