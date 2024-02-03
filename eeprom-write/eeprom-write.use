@@ -1,0 +1,18 @@
+eeprom-write v0.0.0
+Copyright (C) 2023 Carleton University InSpace Rocketry Design Team
+
+This program comes with ABSOLUTELY NO WARRANTY. This is free software, and you
+are welcome to redistribute it under certain conditions. Please see the GNUGPLv3
+license for more details: https://www.gnu.org/licenses/
+
+DESCRIPTION:
+    A command line utility for writing data to an EEPROM. Specifically developed
+    around the M24C02 I2C Board ID EEPROM.
+
+SYNTAX:
+    eeprom-write bus addr file
+
+ARGUMENTS:
+    bus     The I2C bus device descriptor (i.e. /dev/i2c1).
+    addr    The address of the EEPROM on the I2C bus in hexadecimal (i.e. 50).
+    file    The path to the file whose contents will be written into the EEPROM.

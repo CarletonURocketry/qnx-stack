@@ -1,7 +1,7 @@
 MODULES = fetcher packager broadcaster
 MODULE_PATHS = $(foreach module,$(MODULES),$(abspath $(module)))
 PI_ARCH = nto-aarch64-o.le
-UTILITIES = i2c-scanner
+UTILITIES = i2c-scanner eeprom-write
 BINARIES = $(foreach module,$(MODULES) $(UTILITIES),$(abspath $(module))/$(PI_ARCH)/$(module))
 
 # Port is optional but will be 22 by default
