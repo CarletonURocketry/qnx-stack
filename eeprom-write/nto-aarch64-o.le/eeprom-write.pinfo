@@ -4,5 +4,5 @@ INSTALLNAME=eeprom-write
 NAME=eeprom-write
 USER=golin
 HOST=Linguini
-DATE=2024/02/03-14:05:16-EST
+DATE=2024/02/03-15:30:51-EST
 DESCRIPTION=CUInSpace eeprom-write

@@ -12,38 +12,47 @@
 /** The speed of the I2C bus in kilobits per second. */
 #define BUS_SPEED 400000
 
+/** The address of the EEPROM on the I2C bus. */
+#define EEPROM_ADDR 0x50
+
+/** Mask for reading the EEPROM. */
+#define eeread(addr) (addr | 0x1)
+
+/** Mask for writing to the EEPROM. */
+#define eewrite(addr) (addr & 0xFE)
+
 /** Name of I2C device descriptor to look for the EEPROM on. */
 static char *i2c_device = NULL;
-/** The address of the EEPROM on the I2C bus. */
-static uint8_t eeprom_addr = 0;
 /** The file path of the file containing the information to be written to the EEPROM. */
 static char *file_path = NULL;
 
 int main(int argc, char **argv) {
 
+    /* Fetch command line arguments. */
+    int c;
+    while ((c = getopt(argc, argv, ":w:")) != -1) {
+        switch (c) {
+        case 'w':
+            file_path = optarg;
+            break;
+        case ':':
+            fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+            exit(EXIT_FAILURE);
+        case '?':
+            fprintf(stderr, "Unkown option -%c.\n", optopt);
+            exit(EXIT_FAILURE);
+        default:
+            fputs("Please see the 'use' page for usage.", stderr);
+            return EXIT_FAILURE;
+        }
+    }
+
     /* Check for positional arguments. */
-    if (argc != 4) {
-        if (argc < 2) fprintf(stderr, "The device descriptor of the I2C bus is required.\n");
-        if (argc < 3) fprintf(stderr, "The address of the EEPROM is required.\n");
-        if (argc < 4) fprintf(stderr, "The path to the file containing the write data is required.\n");
+    if (optind >= argc) {
+        fprintf(stderr, "I2C bus device descriptor is required.\n");
         exit(EXIT_FAILURE);
     }
-    i2c_device = argv[1];
-    eeprom_addr = strtoul(argv[2], NULL, 16); // Parse address as unsigned hex
-    file_path = argv[3];
-
-    /* Try to open file. */
-    FILE *file = fopen(file_path, "rb");
-    if (file == NULL) {
-        fprintf(stderr, "Could not open file '%s'\n", file_path);
-        exit(EXIT_FAILURE);
-    }
-
-    /* Check that EEPROM address is within 7 bit address space. */
-    if (eeprom_addr >= 128) {
-        fprintf(stderr, "EEPROM address of 0x%02x is not within the 7 bit I2C addressing space.\n", eeprom_addr);
-        exit(EXIT_FAILURE);
-    }
+    i2c_device = argv[optind];
 
     /* Open I2C. */
     int bus = open(i2c_device, O_RDWR);
@@ -60,16 +69,42 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
+    // Read mode
+    if (file_path == NULL) {
+        printf("READ MODE\n");
+        return 0;
+    }
+
+    /* Try to open file. */
+    FILE *file = fopen(file_path, "rb");
+    if (file == NULL) {
+        fprintf(stderr, "Could not open file '%s'\n", file_path);
+        exit(EXIT_FAILURE);
+    }
+
     // Set up the I2C packet for writing a single byte of data
-    i2c_send_t header = {.stop = 1, .len = 1, .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eeprom_addr}};
-    uint8_t write_command[sizeof(header) + 1];
+    i2c_send_t header = {.stop = 1, .len = 2, .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eewrite(EEPROM_ADDR)}};
+    uint8_t write_command[sizeof(header) + 2]; // Save space for byte address and data byte
+    memcpy(write_command, &header, sizeof(header));
     uint8_t data;
+    uint8_t addr = 0;
 
     // Write all data to the EEPROM
     while (!feof(file)) {
         fread(&data, sizeof(uint8_t), 1, file);
-        write_command[sizeof(header)] = data; // Write the next byte of data
+        write_command[sizeof(header)] = addr;     // Write to the next address
+        write_command[sizeof(header) + 1] = data; // Write the next byte of data
+        errno_t error = devctl(bus, DCMD_I2C_SEND, write_command, sizeof(write_command), NULL);
+        if (error != EOK) {
+            fprintf(stderr, "Error writing byte %02x: %s\n", data, strerror(error));
+            fclose(file);
+            exit(EXIT_FAILURE);
+        } else {
+            printf("Byte %02x written.\n", data);
+        }
+        addr++;
     }
 
+    fclose(file);
     return 0;
 }
