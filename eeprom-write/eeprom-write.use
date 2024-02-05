@@ -10,7 +10,7 @@ DESCRIPTION:
     around the M24C02 I2C Board ID EEPROM which requires address 0x5X.
 
 SYNTAX:
-    eeprom-write [-w file] bus
+    eeprom-write [OPTIONS] bus
 
 ARGUMENTS:
     bus     The I2C bus device descriptor (i.e. /dev/i2c1).
@@ -18,3 +18,6 @@ ARGUMENTS:
 OPTIONS:
     -w file    The path to the file whose contents will be written into the
                EEPROM. If this option isn't passed, the EEPROM will be read.
+    -e         Erases the EEPROM with 0 bytes at every address. If used with
+               the write operation, the EEPROM will be erased before the
+               write.

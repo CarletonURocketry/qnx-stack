@@ -15,6 +15,9 @@
 /** The address of the EEPROM on the I2C bus. */
 #define EEPROM_ADDR 0x50
 
+/** The maximum capacity of the EEPROM in bytes. */
+#define EEPROM_CAP 128
+
 /** Mask for reading the EEPROM. */
 #define eeread(addr) (addr | 0x1)
 
@@ -27,15 +30,22 @@ static char *i2c_device = NULL;
 /** The file path of the file containing the information to be written to the EEPROM. */
 static char *file_path = NULL;
 
+/** Whether or not the EEPROM should be erased. */
+static bool erase = false;
+
 errno_t eeprom_read(uint8_t addr, int bus, void *buf, size_t n);
 size_t eeprom_write(uint8_t addr, int bus, void const *buf, size_t n);
+bool eeprom_erase(uint8_t addr, int bus);
 
 int main(int argc, char **argv) {
 
     /* Fetch command line arguments. */
     int c;
-    while ((c = getopt(argc, argv, ":w:")) != -1) {
+    while ((c = getopt(argc, argv, ":w:e")) != -1) {
         switch (c) {
+        case 'e':
+            erase = true;
+            break;
         case 'w':
             file_path = optarg;
             break;
@@ -73,10 +83,15 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
+    /** Erase the EEPROM. */
+    if (erase) {
+        eeprom_erase(0, bus);
+        if (file_path == NULL) return 0; // If we wanted to read, return early.
+    }
+
     // Read mode
     if (file_path == NULL) {
-
-        uint8_t buf[100];
+        uint8_t buf[EEPROM_CAP];
         if (eeprom_read(0, bus, buf, sizeof(buf)) != EOK) {
             fprintf(stderr, "Could not read from EEPROM.\n");
             exit(EXIT_FAILURE);
@@ -153,4 +168,11 @@ size_t eeprom_write(uint8_t addr, int bus, void const *buf, size_t n) {
         addr++;
     }
     return n;
+}
+
+bool eeprom_erase(uint8_t addr, int bus) {
+    static const uint8_t zeroes[EEPROM_CAP] = {0};
+    size_t nwrote = eeprom_write(addr, bus, zeroes, EEPROM_CAP);
+    if (nwrote != EEPROM_CAP) return false;
+    return true;
 }
