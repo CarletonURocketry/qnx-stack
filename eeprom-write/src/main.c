@@ -33,6 +33,12 @@ static char *file_path = NULL;
 /** Whether or not the EEPROM should be erased. */
 static bool erase = false;
 
+/** Defines a small buffer for the dummy write request. */
+struct dummy_write_t {
+    i2c_send_t header;    /**< The send header containing address information. */
+    uint8_t byte_address; /** The byte address for beginning the read. */
+};
+
 errno_t eeprom_read(uint8_t addr, int bus, void *buf, size_t n);
 size_t eeprom_write(uint8_t addr, int bus, void const *buf, size_t n);
 bool eeprom_erase(uint8_t addr, int bus);
@@ -125,16 +131,17 @@ int main(int argc, char **argv) {
 
 errno_t eeprom_read(uint8_t addr, int bus, void *buf, size_t n) {
     // Dummy write to start from address
-    i2c_send_t dummy_header = {
-        .stop = 0,
-        .len = 1,
-        .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eewrite(EEPROM_ADDR)},
+    static struct dummy_write_t dummy_write = {
+        .header =
+            {
+                .stop = 0,
+                .len = 1,
+                .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eewrite(EEPROM_ADDR)},
+            },
     };
+    dummy_write.byte_address = addr;
 
-    uint8_t dummy_write[sizeof(dummy_header) + 1];
-    memcpy(dummy_write, &dummy_header, sizeof(dummy_header));
-    dummy_write[sizeof(dummy_header)] = addr; // Address 0
-    errno_t err = devctl(bus, DCMD_I2C_SEND, dummy_write, sizeof(dummy_write), NULL);
+    errno_t err = devctl(bus, DCMD_I2C_SEND, &dummy_write, sizeof(dummy_write), NULL);
     if (err != EOK) return err;
 
     // Start sequential read
