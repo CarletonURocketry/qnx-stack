@@ -23,8 +23,12 @@
 
 /** Name of I2C device descriptor to look for the EEPROM on. */
 static char *i2c_device = NULL;
+
 /** The file path of the file containing the information to be written to the EEPROM. */
 static char *file_path = NULL;
+
+errno_t eeprom_read(uint8_t addr, int bus, void *buf, size_t n);
+size_t eeprom_write(uint8_t addr, int bus, void const *buf, size_t n);
 
 int main(int argc, char **argv) {
 
@@ -71,36 +75,20 @@ int main(int argc, char **argv) {
 
     // Read mode
     if (file_path == NULL) {
-        // Dummy write to start from address 0
-        i2c_send_t dummy_header = {
-            .stop = 0,
-            .len = 1,
-            .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eewrite(EEPROM_ADDR)},
-        };
-        uint8_t dummy_write[sizeof(dummy_header) + 1];
-        memcpy(dummy_write, &dummy_header, sizeof(dummy_header));
-        dummy_write[sizeof(dummy_header)] = 0x0; // Address 0
-        if (devctl(bus, DCMD_I2C_SEND, dummy_write, sizeof(dummy_write), NULL) != EOK) {
-            fprintf(stderr, "Failed to send dummy write.\n");
-            exit(EXIT_FAILURE);
-        }
 
-        // Start sequential read
-        i2c_sendrecv_t read_header = {
-            .stop = 1,
-            .send_len = 0,
-            .recv_len = 1,
-            .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eeread(EEPROM_ADDR)},
-        };
-        uint8_t buffer[sizeof(read_header) + 1];
-        memcpy(buffer, &read_header, sizeof(read_header));
-        errno_t error = devctl(bus, DCMD_I2C_SENDRECV, buffer, sizeof(buffer), NULL);
-        if (error != EOK) {
-            fprintf(stderr, "Failed to initiate sequential read with error: %s\n", strerror(error));
-            exit(EXIT_FAILURE);
+        uint8_t addr = 0;
+        uint8_t length = 15;
+        while (addr < length) {
+            uint8_t buf[1];
+            if (eeprom_read(addr, bus, buf, sizeof(buf)) != EOK) {
+                fprintf(stderr, "Could not read from EEPROM.\n");
+                exit(EXIT_FAILURE);
+            }
+            for (size_t i = 0; i < sizeof(buf); i++) {
+                putchar(buf[i]);
+            }
+            addr++;
         }
-        printf("%c", buffer[sizeof(read_header)]);
-        putchar('\n');
 
         return 0;
     }
@@ -112,29 +100,66 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    // Set up the I2C packet for writing a single byte of data
-    i2c_send_t header = {.stop = 1, .len = 2, .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eewrite(EEPROM_ADDR)}};
-    uint8_t write_command[sizeof(header) + 2]; // Save space for byte address and data byte
-    memcpy(write_command, &header, sizeof(header));
-    uint8_t data;
-    uint8_t addr = 0;
-
     // Write all data to the EEPROM
+    uint8_t buf[10];
+    uint8_t addr = 0;
     while (!feof(file)) {
-        fread(&data, sizeof(uint8_t), 1, file);
-        write_command[sizeof(header)] = addr;     // Write to the next address
-        write_command[sizeof(header) + 1] = data; // Write the next byte of data
-        errno_t error = devctl(bus, DCMD_I2C_SEND, write_command, sizeof(write_command), NULL);
-        if (error != EOK) {
-            fprintf(stderr, "Error writing byte %02x: %s\n", data, strerror(error));
-            fclose(file);
-            exit(EXIT_FAILURE);
-        } else {
-            printf("Byte %02x written.\n", data);
+        size_t nread = fread(&buf, sizeof(uint8_t), sizeof(buf), file);
+        printf("Writing bytes:");
+        for (size_t i = 0; i < nread; i++) {
+            putchar(buf[i]);
         }
-        addr++;
+        putchar('\n');
+        eeprom_write(addr, bus, buf, sizeof(nread));
+        addr += sizeof(nread);
     }
 
     fclose(file);
     return 0;
+}
+
+errno_t eeprom_read(uint8_t addr, int bus, void *buf, size_t n) {
+    // Dummy write to start from address
+    i2c_send_t dummy_header = {
+        .stop = 0,
+        .len = 1,
+        .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eewrite(EEPROM_ADDR)},
+    };
+
+    uint8_t dummy_write[sizeof(dummy_header) + 1];
+    memcpy(dummy_write, &dummy_header, sizeof(dummy_header));
+    dummy_write[sizeof(dummy_header)] = addr; // Address 0
+    errno_t err = devctl(bus, DCMD_I2C_SEND, dummy_write, sizeof(dummy_write), NULL);
+    if (err != EOK) return err;
+
+    // Start sequential read
+    i2c_sendrecv_t read_header = {
+        .stop = 1,
+        .send_len = 0,
+        .recv_len = n,
+        .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eewrite(EEPROM_ADDR)},
+    };
+    uint8_t buffer[sizeof(read_header) + n];
+    memcpy(buffer, &read_header, sizeof(read_header));
+    err = devctl(bus, DCMD_I2C_SENDRECV, buffer, sizeof(buffer), NULL);
+    if (err != EOK) return err;
+    memcpy(buf, &buffer[sizeof(read_header)], n);
+    return EOK;
+}
+
+size_t eeprom_write(uint8_t addr, int bus, void const *buf, size_t n) {
+
+    // Set up the I2C packet for writing a single byte of data
+    i2c_send_t header = {.stop = 1, .len = 2, .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eewrite(EEPROM_ADDR)}};
+    uint8_t write_command[sizeof(header) + 2]; // Save space for byte address and data
+    memcpy(write_command, &header, sizeof(header));
+
+    for (size_t i = 0; i < n; i++) {
+        write_command[sizeof(header)] = addr;                            // Write to the selected address
+        write_command[sizeof(header) + 1] = ((uint8_t const *)(buf))[i]; // Write data
+        errno_t error = devctl(bus, DCMD_I2C_SEND, write_command, sizeof(write_command), NULL);
+        if (error != EOK) return i;
+        usleep(5000); // Some delay (5ms is the datasheet defined max)
+    }
+    return n;
 }
