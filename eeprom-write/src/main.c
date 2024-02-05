@@ -76,18 +76,13 @@ int main(int argc, char **argv) {
     // Read mode
     if (file_path == NULL) {
 
-        uint8_t addr = 0;
-        uint8_t length = 15;
-        while (addr < length) {
-            uint8_t buf[1];
-            if (eeprom_read(addr, bus, buf, sizeof(buf)) != EOK) {
-                fprintf(stderr, "Could not read from EEPROM.\n");
-                exit(EXIT_FAILURE);
-            }
-            for (size_t i = 0; i < sizeof(buf); i++) {
-                putchar(buf[i]);
-            }
-            addr++;
+        uint8_t buf[100];
+        if (eeprom_read(0, bus, buf, sizeof(buf)) != EOK) {
+            fprintf(stderr, "Could not read from EEPROM.\n");
+            exit(EXIT_FAILURE);
+        }
+        for (size_t i = 0; i < sizeof(buf); i++) {
+            putchar(buf[i]);
         }
 
         return 0;
@@ -105,13 +100,8 @@ int main(int argc, char **argv) {
     uint8_t addr = 0;
     while (!feof(file)) {
         size_t nread = fread(&buf, sizeof(uint8_t), sizeof(buf), file);
-        printf("Writing bytes:");
-        for (size_t i = 0; i < nread; i++) {
-            putchar(buf[i]);
-        }
-        putchar('\n');
-        eeprom_write(addr, bus, buf, sizeof(nread));
-        addr += sizeof(nread);
+        eeprom_write(addr, bus, buf, nread);
+        addr += nread;
     }
 
     fclose(file);
@@ -160,6 +150,7 @@ size_t eeprom_write(uint8_t addr, int bus, void const *buf, size_t n) {
         errno_t error = devctl(bus, DCMD_I2C_SEND, write_command, sizeof(write_command), NULL);
         if (error != EOK) return i;
         usleep(5000); // Some delay (5ms is the datasheet defined max)
+        addr++;
     }
     return n;
 }
