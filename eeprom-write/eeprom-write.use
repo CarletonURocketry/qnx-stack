@@ -7,13 +7,15 @@ license for more details: https://www.gnu.org/licenses/
 
 DESCRIPTION:
     A command line utility for writing data to an EEPROM. Specifically developed
-    around the M24C02 I2C Board ID EEPROM which requires address 0x5X.
+    around the M24C02 I2C Board ID EEPROM.
 
 SYNTAX:
-    eeprom-write [OPTIONS] bus
+    eeprom-write [OPTIONS] bus address
 
 ARGUMENTS:
-    bus     The I2C bus device descriptor (i.e. /dev/i2c1).
+    bus        The I2C bus device descriptor (i.e. /dev/i2c1).
+    address    The 7 bit I2C address of the EEPROM on the board in 
+               hexadecimal (i.e. 77).
 
 OPTIONS:
     -w file    The path to the file whose contents will be written into the

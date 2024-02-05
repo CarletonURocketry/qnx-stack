@@ -12,9 +12,6 @@
 /** The speed of the I2C bus in kilobits per second. */
 #define BUS_SPEED 400000
 
-/** The address of the EEPROM on the I2C bus. */
-#define EEPROM_ADDR 0x50
-
 /** The maximum capacity of the EEPROM in bytes. */
 #define EEPROM_CAP 128
 
@@ -32,6 +29,9 @@ static char *file_path = NULL;
 
 /** Whether or not the EEPROM should be erased. */
 static bool erase = false;
+
+/** Address of the EEPROM on the I2C bus. */
+static uint8_t eeprom_addr = 0x50;
 
 /** Defines a small buffer for the dummy write request. */
 struct dummy_write_t {
@@ -73,6 +73,12 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
     i2c_device = argv[optind];
+    optind++;
+    if (optind >= argc) {
+        fprintf(stderr, "Address of the EEPROM is required.\n");
+        exit(EXIT_FAILURE);
+    }
+    eeprom_addr = strtoul(argv[optind], NULL, 16);
 
     /* Open I2C. */
     int bus = open(i2c_device, O_RDWR);
@@ -136,9 +142,10 @@ errno_t eeprom_read(uint8_t addr, int bus, void *buf, size_t n) {
             {
                 .stop = 0,
                 .len = 1,
-                .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eewrite(EEPROM_ADDR)},
+                .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = 0x50},
             },
     };
+    dummy_write.header.slave.addr = eewrite(eeprom_addr);
     dummy_write.byte_address = addr;
 
     errno_t err = devctl(bus, DCMD_I2C_SEND, &dummy_write, sizeof(dummy_write), NULL);
@@ -149,7 +156,7 @@ errno_t eeprom_read(uint8_t addr, int bus, void *buf, size_t n) {
         .stop = 1,
         .send_len = 0,
         .recv_len = n,
-        .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eewrite(EEPROM_ADDR)},
+        .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eewrite(eeprom_addr)},
     };
     uint8_t buffer[sizeof(read_header) + n];
     memcpy(buffer, &read_header, sizeof(read_header));
@@ -162,7 +169,7 @@ errno_t eeprom_read(uint8_t addr, int bus, void *buf, size_t n) {
 size_t eeprom_write(uint8_t addr, int bus, void const *buf, size_t n) {
 
     // Set up the I2C packet for writing a single byte of data
-    i2c_send_t header = {.stop = 1, .len = 2, .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eewrite(EEPROM_ADDR)}};
+    i2c_send_t header = {.stop = 1, .len = 2, .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eewrite(eeprom_addr)}};
     uint8_t write_command[sizeof(header) + 2]; // Save space for byte address and data
     memcpy(write_command, &header, sizeof(header));
 
