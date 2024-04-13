@@ -15,12 +15,6 @@
 /** The maximum capacity of the EEPROM in bytes. */
 #define EEPROM_CAP 128
 
-/** Mask for reading the EEPROM. */
-#define eeread(addr) (addr | 0x1)
-
-/** Mask for writing to the EEPROM. */
-#define eewrite(addr) (addr & 0xFE)
-
 /** Name of I2C device descriptor to look for the EEPROM on. */
 static char *i2c_device = NULL;
 
@@ -145,7 +139,7 @@ errno_t eeprom_read(uint8_t addr, int bus, void *buf, size_t n) {
                 .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = 0x50},
             },
     };
-    dummy_write.header.slave.addr = eewrite(eeprom_addr);
+    dummy_write.header.slave.addr = eeprom_addr;
     dummy_write.byte_address = addr;
 
     errno_t err = devctl(bus, DCMD_I2C_SEND, &dummy_write, sizeof(dummy_write), NULL);
@@ -156,7 +150,7 @@ errno_t eeprom_read(uint8_t addr, int bus, void *buf, size_t n) {
         .stop = 1,
         .send_len = 0,
         .recv_len = n,
-        .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eewrite(eeprom_addr)},
+        .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eeprom_addr},
     };
     uint8_t buffer[sizeof(read_header) + n];
     memcpy(buffer, &read_header, sizeof(read_header));
@@ -169,7 +163,7 @@ errno_t eeprom_read(uint8_t addr, int bus, void *buf, size_t n) {
 size_t eeprom_write(uint8_t addr, int bus, void const *buf, size_t n) {
 
     // Set up the I2C packet for writing a single byte of data
-    i2c_send_t header = {.stop = 1, .len = 2, .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eewrite(eeprom_addr)}};
+    i2c_send_t header = {.stop = 1, .len = 2, .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eeprom_addr}};
     uint8_t write_command[sizeof(header) + 2]; // Save space for byte address and data
     memcpy(write_command, &header, sizeof(header));
 
