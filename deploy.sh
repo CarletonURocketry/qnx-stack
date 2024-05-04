@@ -2,7 +2,7 @@
 
 usage() { echo "Usage: $0 [-u username] [-p port] -h host" 1>&2; exit 1; }
 
-while getopts "uph:" opt; do
+while getopts "u:p:h:" opt; do
     case "${opt}" in
         u)
             username=${OPTARG}
