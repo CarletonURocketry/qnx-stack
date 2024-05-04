@@ -2,7 +2,7 @@
 
 usage() { echo "Usage: $0 [-u username] [-p port] -h host" 1>&2; exit 1; }
 
-while getopts "uh:" opt; do
+while getopts "uph:" opt; do
     case "${opt}" in
         u)
             username=${OPTARG}
@@ -42,7 +42,7 @@ pi_addr=$username@$host
 user_dir=/tmp/$USER
 
 # Create username specific directory on the Pi
-sshpass -f .password ssh $pi_addr mkdir -p $user_dir
+sshpass -f .password ssh $pi_addr -p $port mkdir -p $user_dir
 
 # Transfer all files passed as arguments
-sshpass -f .password scp -O $@ $pi_addr:$user_dir
+sshpass -f .password scp -P $port -O $@ $pi_addr:$user_dir
