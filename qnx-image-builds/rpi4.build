@@ -196,12 +196,6 @@ network=\{
     #dhclient -m -lf /dev/shmem/dhclient.leases -pf /dev/shmem/dhclient.pid -nw bcm0
 
     #######################################################################
-    ## AUDIO driver
-    #######################################################################
-    #display_msg Starting Audio driver...
-    #io-audio -c /etc/system/config/audio/io_audio.conf
-    
-    #######################################################################
     ## Message queue server
     #######################################################################
     mqueue
@@ -364,57 +358,6 @@ spi-bcm2711.so
 wpa_cli=wpa_cli-2.9
 wpa_passphrase=wpa_passphrase-2.9
 wpa_supplicant=wpa_supplicant-2.9
-
-###########################################################################
-## Screen graphics support
-###########################################################################
-/usr/lib/libdrm.so=libdrm.so
-/lib/dll/screen-rpi4drm.so=screen-rpi4drm.so
-/sbin/drm-rpi4=drm-rpi4
-/usr/lib/graphics/rpi4-drm/broadcom_icd.json=graphics/rpi4-drm/broadcom_icd.json
-/usr/lib/graphics/rpi4-drm/gpu_drm-rpi4.so=graphics/rpi4-drm/gpu_drm-rpi4.so
-/usr/lib/graphics/rpi4-drm/graphics-rpi4-atomic.conf=graphics/rpi4-drm/graphics-rpi4-atomic.conf
-/usr/lib/graphics/rpi4-drm/libEGL-mesa.so=graphics/rpi4-drm/libEGL-mesa.so
-/usr/lib/graphics/rpi4-drm/libGLESv1_CM-mesa.so=graphics/rpi4-drm/libGLESv1_CM-mesa.so
-/usr/lib/graphics/rpi4-drm/libGLESv2-mesa.so=graphics/rpi4-drm/libGLESv2-mesa.so
-/usr/lib/graphics/rpi4-drm/libWFDrpi4-drm-atomic.so=graphics/rpi4-drm/libWFDrpi4-drm-atomic.so
-/usr/lib/graphics/rpi4-drm/libglapi-mesa.so=graphics/rpi4-drm/libglapi-mesa.so"
-/usr/lib/graphics/rpi4-drm/libvulkan_broadcom.so=graphics/rpi4-drm/libvulkan_broadcom.so"
-/usr/lib/graphics/rpi4-drm/libwfdcfg-rpi4-generic.so=graphics/rpi4-drm/libwfdcfg-rpi4-generic.so
-/usr/lib/graphics/rpi4-drm/v3d_dri.so=graphics/rpi4-drm/v3d_dri.so
-/usr/lib/libc++.so=libc++.so
-/usr/lib/libhiddi.so=libhiddi.so
-/usr/lib/libcatalog.so=libcatalog.so
-                
-/lib/dll/screen-debug.so=screen-debug.so
-/lib/dll/screen-gles2.so=screen-gles2.so
-/lib/dll/screen-gles2blt.so=screen-gles2blt.so
-/lib/dll/screen-stdbuf.so=screen-stdbuf.so
-/lib/dll/screen-sw.so=screen-sw.so
-/lib/libmemobj.so=libmemobj.so
-/lib/libscrmem.so=libscrmem.so
-/sbin/screen=screen
-/usr/lib/graphics/vulkan/VkLayer_MESA_overlay.json=graphics/vulkan/VkLayer_MESA_overlay.json
-/usr/lib/graphics/vulkan/VkLayer_api_dump.json=graphics/vulkan/VkLayer_api_dump.json
-/usr/lib/graphics/vulkan/VkLayer_khronos_validation.json=graphics/vulkan/VkLayer_khronos_validation.json
-/usr/lib/graphics/vulkan/libVkLayer_MESA_overlay.so=graphics/vulkan/libVkLayer_MESA_overlay.so
-/usr/lib/graphics/vulkan/libVkLayer_api_dump.so=graphics/vulkan/libVkLayer_api_dump.so
-/usr/lib/graphics/vulkan/libVkLayer_khronos_validation.so=graphics/vulkan/libVkLayer_khronos_validation.so
-/usr/lib/graphics/vulkan/vk_layer_settings.txt=graphics/vulkan/vk_layer_settings.txt
-/usr/lib/libCL.so=libCL.so
-/usr/lib/libEGL.so=libEGL.so
-/usr/lib/libGLESv1_CL.so=libGLESv1_CL.so
-/usr/lib/libGLESv1_CM.so=libGLESv1_CM.so
-/usr/lib/libGLESv2.so=libGLESv2.so
-/usr/lib/libOpenCL.so=libOpenCL.so
-/usr/lib/libOpenVG.so=libOpenVG.so
-/usr/lib/libOpenVGU.so=libOpenVGU.so
-/usr/lib/libWFD.so=libWFD.so
-/usr/lib/libscreen.so=libscreen.so
-/usr/lib/libvulkan.so=libvulkan.so
-                
-/usr/bin/gles2-gears=gles2-gears
-/usr/bin/sw-vsync=sw-vsync
 
 ###########################################################################
 ## libqcrypto support
@@ -588,38 +531,6 @@ pool_size=260
 ################################################################################
 [ctrl]
 name=bcm2711_pwm
-
-######################################################################################
-# bcm2711_pcm for Raspiaudio DAC HAT Ultra+, uncomment if your board has this DAC HAT
-# if uncommenting this section, update the pool_size under [global] to account for
-# the added audio devices (260K * 2)
-######################################################################################
-#[ctrl]
-#name=bcm2711_pcm
-#options=rate=48000,bits=24,tx_dma=4,rx_voices=2,rx_dma=6
-#mixer_dll=wm8960
-#wm8960_mclk=24576000
-#wm8960_adclrc=1                     # DAC and ADC share the LRCLK
-#wm8960_i2cdev=1
-#wm8960_i2caddr=0x1A
-#wm8960_output=all                   # Enable speaker and headphone outputs
-#wm8960_mic=enable:single-ended      # Enable Mic In (input1) in single-ended mode
-#wm8960_line2=enable:0               # Enable Line In (input2) with a fixed 0dB gain adjustment
-#wm8960_line3=enable:-3              # Enable Line In (input3) with a fixed -3db gain adjustment
-#wm8960_micbias=1
-
-###################################################################################
-# bcm2711_pcm for JustBoom DAC HAT audio, uncomment if your board has this DAC HAT
-# If uncommenting this section, update the pool_size under [global] to add an
-# additional 260K
-###################################################################################
-#[ctrl]
-#name=bcm2711_pcm
-#options=rate=48000,bits=16,tx_dma=4
-#mixer_dll=pcm512x
-#pcm512x_i2c_dev=1
-#pcm512x_i2c_addr=77
-}
 
 ###########################################################################
 ## SPI driver
