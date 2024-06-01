@@ -11,3 +11,6 @@
 [submodule "broadcaster"]
 	path = broadcaster
 	url = https://github.com/CarletonURocketry/broadcaster.git
+[submodule "plogger"]
+	path = plogger
+	url = https://github.com/CarletonURocketry/plogger.git
