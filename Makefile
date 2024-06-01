@@ -1,4 +1,4 @@
-MODULES = fetcher packager broadcaster
+MODULES = fetcher packager broadcaster plogger
 MODULE_PATHS = $(foreach module,$(MODULES),$(abspath $(module)))
 PI_ARCH = nto-aarch64-o.le
 UTILITIES = i2c-scanner eeprom-write
