@@ -31,7 +31,7 @@
 *.dylib
 
 # Executables
-fetcher
+i2c-scanner
 *.exe
 *.out
 *.app
