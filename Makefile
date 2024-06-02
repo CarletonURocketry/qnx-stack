@@ -17,7 +17,7 @@ $(MODULES):
 	$(MAKE) all -C $(abspath $@)
 
 # Compiles all binaries
-all: $(MODULES)
+all: $(MODULES) $(UTILITIES)
 	$(info All modules built!)
 
 $(UTILITIES):
