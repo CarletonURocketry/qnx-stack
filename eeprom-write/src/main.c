@@ -23,7 +23,7 @@ bool erase = false;
 uint8_t eeprom_addr = 0x50;
 
 /** Buffer to store the contents read from the EEPROM. */
-uint8_t buf[M24C02_CAP + 1];
+char buf[M24C01_CAP + 1] = {0};
 
 int main(int argc, char **argv) {
 
@@ -78,27 +78,24 @@ int main(int argc, char **argv) {
     }
 
     // Construct the sensor location of the EEPROM
-    SensorLocation loc = {
-        .bus = bus,
-        .addr = {.fmt = I2C_ADDRFMT_7BIT, .addr = eeprom_addr},
-    };
+    SensorLocation loc = {.bus = bus, .addr = {.addr = eeprom_addr, .fmt = I2C_ADDRFMT_7BIT}};
 
     /* Erase the EEPROM. */
     if (erase) {
-        m24c0x_erase(&loc, M24C02_CAP);
+        m24c0x_erase(&loc, M24C01_CAP);
         if (file_path == NULL) return 0; // If we wanted to read, return early.
     }
 
     // Read mode
     if (file_path == NULL) {
 
-        err = m24c0x_seq_read_rand(&loc, 0x00, buf, M24C02_CAP);
+        err = m24c0x_seq_read_rand(&loc, 0x00, (uint8_t *)buf, M24C01_CAP);
         if (err) {
-            fprintf(stderr, "Could not read from EEPROM.\n");
+            fprintf(stderr, "Could not read from EEPROM: %s.\n", strerror(err));
             exit(EXIT_FAILURE);
         }
 
-        buf[M24C02_CAP] = '\0'; // End buffer with null terminator to avoid overflow
+        buf[M24C01_CAP] = '\0'; // End buffer with null terminator to avoid overflow
         printf("%s", buf);
 
         return 0;
