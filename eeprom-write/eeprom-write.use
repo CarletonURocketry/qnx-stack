@@ -7,7 +7,7 @@ license for more details: https://www.gnu.org/licenses/
 
 DESCRIPTION:
     A command line utility for writing data to an EEPROM. Specifically developed
-    around the M24C02 I2C Board ID EEPROM.
+    around the M24C02 I2C Board ID EEPROM used by CU InSpace.
 
 SYNTAX:
     eeprom-write [OPTIONS] bus address

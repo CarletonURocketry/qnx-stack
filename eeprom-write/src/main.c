@@ -1,8 +1,6 @@
-#include <devctl.h>
-#include <errno.h>
+#include "../fetcher/src/drivers/m24c0x/m24c0x.h"
 #include <fcntl.h>
 #include <getopt.h>
-#include <hw/i2c.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -12,30 +10,20 @@
 /** The speed of the I2C bus in kilobits per second. */
 #define BUS_SPEED 400000
 
-/** The maximum capacity of the EEPROM in bytes. */
-#define EEPROM_CAP 128
-
 /** Name of I2C device descriptor to look for the EEPROM on. */
-static char *i2c_device = NULL;
+char *i2c_device = NULL;
 
 /** The file path of the file containing the information to be written to the EEPROM. */
-static char *file_path = NULL;
+char *file_path = NULL;
 
 /** Whether or not the EEPROM should be erased. */
-static bool erase = false;
+bool erase = false;
 
 /** Address of the EEPROM on the I2C bus. */
-static uint8_t eeprom_addr = 0x50;
+uint8_t eeprom_addr = 0x50;
 
-/** Defines a small buffer for the dummy write request. */
-struct dummy_write_t {
-    i2c_send_t header;    /**< The send header containing address information. */
-    uint8_t byte_address; /** The byte address for beginning the read. */
-};
-
-errno_t eeprom_read(uint8_t addr, int bus, void *buf, size_t n);
-size_t eeprom_write(uint8_t addr, int bus, void const *buf, size_t n);
-bool eeprom_erase(uint8_t addr, int bus);
+/** Buffer to store the contents read from the EEPROM. */
+uint8_t buf[M24C02_CAP + 1];
 
 int main(int argc, char **argv) {
 
@@ -83,28 +71,35 @@ int main(int argc, char **argv) {
 
     /* Set I2C bus speed. */
     uint32_t speed = BUS_SPEED;
-    errno_t bus_speed = devctl(bus, DCMD_I2C_SET_BUS_SPEED, &speed, sizeof(speed), NULL);
-    if (bus_speed != EOK) {
-        fprintf(stderr, "Failed to set bus speed to %u with error %s\n", speed, strerror(bus_speed));
+    int err = devctl(bus, DCMD_I2C_SET_BUS_SPEED, &speed, sizeof(speed), NULL);
+    if (err != EOK) {
+        fprintf(stderr, "Failed to set bus speed to %u with error %s\n", speed, strerror(err));
         exit(EXIT_FAILURE);
     }
 
-    /** Erase the EEPROM. */
+    // Construct the sensor location of the EEPROM
+    SensorLocation loc = {
+        .bus = bus,
+        .addr = {.fmt = I2C_ADDRFMT_7BIT, .addr = eeprom_addr},
+    };
+
+    /* Erase the EEPROM. */
     if (erase) {
-        eeprom_erase(0, bus);
+        m24c0x_erase(&loc, M24C02_CAP);
         if (file_path == NULL) return 0; // If we wanted to read, return early.
     }
 
     // Read mode
     if (file_path == NULL) {
-        uint8_t buf[EEPROM_CAP];
-        if (eeprom_read(0, bus, buf, sizeof(buf)) != EOK) {
+
+        err = m24c0x_seq_read_rand(&loc, 0x00, buf, M24C02_CAP);
+        if (err) {
             fprintf(stderr, "Could not read from EEPROM.\n");
             exit(EXIT_FAILURE);
         }
-        for (size_t i = 0; i < sizeof(buf); i++) {
-            putchar(buf[i]);
-        }
+
+        buf[M24C02_CAP] = '\0'; // End buffer with null terminator to avoid overflow
+        printf("%s", buf);
 
         return 0;
     }
@@ -116,71 +111,12 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
-    // Write all data to the EEPROM
-    uint8_t buf[10];
-    uint8_t addr = 0;
-    while (!feof(file)) {
-        size_t nread = fread(&buf, sizeof(uint8_t), sizeof(buf), file);
-        eeprom_write(addr, bus, buf, nread);
-        addr += nread;
+    // Write the maximum amount of data to the EEPROM
+    size_t nread = fread(&buf, sizeof(uint8_t), sizeof(buf), file);
+    for (uint8_t addr = 0; addr < nread; addr++) {
+        m24c0x_write_byte(&loc, addr, buf[addr]);
     }
 
     fclose(file);
     return 0;
-}
-
-errno_t eeprom_read(uint8_t addr, int bus, void *buf, size_t n) {
-    // Dummy write to start from address
-    static struct dummy_write_t dummy_write = {
-        .header =
-            {
-                .stop = 0,
-                .len = 1,
-                .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = 0x50},
-            },
-    };
-    dummy_write.header.slave.addr = eeprom_addr;
-    dummy_write.byte_address = addr;
-
-    errno_t err = devctl(bus, DCMD_I2C_SEND, &dummy_write, sizeof(dummy_write), NULL);
-    if (err != EOK) return err;
-
-    // Start sequential read
-    i2c_sendrecv_t read_header = {
-        .stop = 1,
-        .send_len = 0,
-        .recv_len = n,
-        .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eeprom_addr},
-    };
-    uint8_t buffer[sizeof(read_header) + n];
-    memcpy(buffer, &read_header, sizeof(read_header));
-    err = devctl(bus, DCMD_I2C_SENDRECV, buffer, sizeof(buffer), NULL);
-    if (err != EOK) return err;
-    memcpy(buf, &buffer[sizeof(read_header)], n);
-    return EOK;
-}
-
-size_t eeprom_write(uint8_t addr, int bus, void const *buf, size_t n) {
-
-    // Set up the I2C packet for writing a single byte of data
-    i2c_send_t header = {.stop = 1, .len = 2, .slave = {.fmt = I2C_ADDRFMT_7BIT, .addr = eeprom_addr}};
-    uint8_t write_command[sizeof(header) + 2]; // Save space for byte address and data
-    memcpy(write_command, &header, sizeof(header));
-
-    for (size_t i = 0; i < n; i++) {
-        write_command[sizeof(header)] = addr;                            // Write to the selected address
-        write_command[sizeof(header) + 1] = ((uint8_t const *)(buf))[i]; // Write data
-        errno_t error = devctl(bus, DCMD_I2C_SEND, write_command, sizeof(write_command), NULL);
-        if (error != EOK) return i;
-        usleep(5000); // Some delay (5ms is the datasheet defined max)
-        addr++;
-    }
-    return n;
-}
-
-bool eeprom_erase(uint8_t addr, int bus) {
-    static const uint8_t zeroes[EEPROM_CAP] = {0};
-    size_t nwrote = eeprom_write(addr, bus, zeroes, EEPROM_CAP);
-    if (nwrote != EEPROM_CAP) return false;
-    return true;
 }

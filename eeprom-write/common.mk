@@ -39,6 +39,9 @@ CCFLAGS += -std=$(CSTD) $(OPTIMIZATION) $(WARNINGS)
 SRC_SUBDIRECTORIES = $(shell find $(PROJECT_ROOT)/src -type d)
 EXTRA_SRCVPATH += $(SRC_SUBDIRECTORIES)
 
+# Include EEPROM driver
+EXTRA_SRCVPATH += $(PROJECT_ROOT)/../fetcher/src/drivers/m24c0x
+
 ### EXTRA LIBRARIES ###
 LIBS += i2c-master
 
