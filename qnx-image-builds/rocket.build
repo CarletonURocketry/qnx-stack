@@ -79,10 +79,19 @@
     #######################################
     ## Start telemetry
     #######################################
-    display_msg Starting CU InSpace telemetry system...
-    fetcher
-    packager VA3INI
-    broadcaster -c /dev/ser3
+    display_msg "Starting CU InSpace telemetry system..."
+
+    display_msg "Starting fetcher..."
+    fetcher /dev/i2c1 2> /var/log/fetcher.log &
+
+    display_msg "Starting packager..."
+    packager VA3INI 2> /var/log/packager.log &
+
+    display_msg "Starting plogger..."
+    plogger -o /var/log/red_ballistic.mission 2> /dev/null &
+
+    display_msg "Starting broadcaster..."
+    broadcaster /dev/ser3 2> /var/log/broadcaster.log &
 }
 
 # Redirect console messages
@@ -268,6 +277,7 @@ qnxuser:x:1000:qnxuser
 /bin/packager=packager
 /bin/fetcher=fetcher
 /bin/broadcaster=broadcaster
+/bin/plogger=plogger
 
 ###########################################################################
 ## END OF BUILD SCRIPT
