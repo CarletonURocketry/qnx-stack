@@ -82,16 +82,16 @@
     display_msg "Starting CU InSpace telemetry system..."
 
     display_msg "Starting fetcher..."
-    fetcher /dev/i2c1
+    fetcher /dev/i2c1 &
 
     display_msg "Starting packager..."
-    packager VA3INI
+    packager VA3INI &
 
     display_msg "Starting plogger..."
-    plogger -o /var/log/red_ballistic.mission
+    plogger -o /var/log/red_ballistic.mission &
 
     display_msg "Starting broadcaster..."
-    broadcaster /dev/ser3
+    broadcaster /dev/ser3 &
 }
 
 # Redirect console messages
