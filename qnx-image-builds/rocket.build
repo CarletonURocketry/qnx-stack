@@ -87,17 +87,23 @@
     reopen fetcher.log
     fetcher /dev/i2c1 &
 
+    reopen /dev/ser1
     display_msg "Starting packager..."
+
     touch packager.log
     reopen packager.log
     packager VA3INI &
 
+    reopen /dev/ser1
     display_msg "Starting plogger..."
+
     touch plogger.log
     reopen plogger.log
-    plogger -o /var/log/red_ballistic.mission &
+    plogger -o red_ballistic.mission &
 
+    reopen /dev/ser1
     display_msg "Starting broadcaster..."
+
     touch broadcaster.log
     reopen broadcaster.log
     broadcaster /dev/ser3 &
