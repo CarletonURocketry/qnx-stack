@@ -6,8 +6,14 @@
 #error "Logging utilities requires that a program name be specified."
 #endif
 
-/** Macro to convert program name to a string. */
-#define STRINGIFY(s) #s
+/** Macro to quote program name. */
+#define QUOTE(string) #string
+
+/** Macro to stringify program name. */
+#define STRINGIFY(macro) QUOTE(macro)
+
+/** Stringified program name. */
+#define PROGSTR STRINGIFY(PROGNAME)
 
 /** The buffer size to store the formatted time string. */
 #define TIME_STR_BUFSIZE 50
@@ -47,7 +53,7 @@ void _log_print(FILE *stream, log_level_e lvl, const char *file, const char *fun
 
     // Log to stream
     flockfile(stream);
-    fprintf(stream, "[%s] %s " STRINGIFY(PROGNAME) " %s:%d - %s() - \"", time_str, LEVEL_STRING[lvl], file, line, func);
+    fprintf(stream, "[%s] %s " PROGSTR " %s:%d - %s() - \"", time_str, LEVEL_STRING[lvl], file, line, func);
     vfprintf(stream, fmt_string, args);
     fputc('"', stream);
     fputc('\n', stream);
