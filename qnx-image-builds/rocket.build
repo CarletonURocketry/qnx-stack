@@ -80,23 +80,7 @@
     #######################################
     ## Start telemetry
     #######################################
-    sh telemetry.sh
-}
-
-[perms=777] telemetry.sh = {
-    echo "Starting CU InSpace telemetry system..."
-
-    echo "Starting fetcher..."
-    fetcher /dev/i2c1 2> fetcher.log &
-
-    echo "Starting packager..."
-    packager VA3INI 2> packager.log &
-
-    echo "Starting plogger..."
-    plogger -o red_ballistic.mission 2> plogger.log &
-
-    echo "Starting broadcaster..."
-    broadcaster /dev/ser3 2> broadcaster.log &
+    sh etc/telemetry.sh
 }
 
 # Redirect console messages
@@ -282,6 +266,23 @@ qnxuser:x:1000:qnxuser
 ## TELEMETRY SYSTEM BINARIES
 ## You will need to copy the compiled binaries to the prebuilt/aarch64lw/bin folder in this project
 ###########################################################################
+
+[perms=0777] /etc/telemetry.sh = {
+    echo "Starting CU InSpace telemetry system..."
+
+    echo "Starting fetcher..."
+    fetcher /dev/i2c1 2> fetcher.log &
+
+    echo "Starting packager..."
+    packager VA3INI 2> packager.log &
+
+    echo "Starting plogger..."
+    plogger -o red_ballistic.mission 2> plogger.log &
+
+    echo "Starting broadcaster..."
+    broadcaster /dev/ser3 2> broadcaster.log &
+}
+
 /bin/packager=packager
 /bin/fetcher=fetcher
 /bin/broadcaster=broadcaster
