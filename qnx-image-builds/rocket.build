@@ -29,7 +29,6 @@
 
     # Start some common servers
     slogger2
-    pipe
     dumper -d /dev/shmem &
 
     #######################################################################
