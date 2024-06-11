@@ -282,6 +282,7 @@ qnxuser:x:1000:qnxuser
 /bin/uname=uname
 /usr/bin/use=use
 /bin/waitfor=waitfor
+/bin/touch=touch
 
 ###########################################################################
 ## TELEMETRY SYSTEM BINARIES
