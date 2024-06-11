@@ -82,16 +82,27 @@
     display_msg "Starting CU InSpace telemetry system..."
 
     display_msg "Starting fetcher..."
+    touch fetcher.log
+    reopen fetcher.log
     fetcher /dev/i2c1 &
 
     display_msg "Starting packager..."
+    touch packager.log
+    reopen packager.log
     packager VA3INI &
 
     display_msg "Starting plogger..."
+    touch plogger.log
+    reopen plogger.log
     plogger -o /var/log/red_ballistic.mission &
 
     display_msg "Starting broadcaster..."
+    touch broadcaster.log
+    reopen broadcaster.log
     broadcaster /dev/ser3 &
+
+    # Put messages back to regular debug UART
+    reopen /dev/ser1
 }
 
 # Redirect console messages
