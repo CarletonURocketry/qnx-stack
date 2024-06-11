@@ -52,10 +52,10 @@ void _log_print(FILE *stream, log_level_e lvl, const char *file, const char *fun
     strftime(time_str, sizeof(time_str), TIME_FORMAT, tm);
 
     // Log to stream
-    flockfile(stream);
+    //flockfile(stream);
     fprintf(stream, "[%s] %s " PROGSTR " %s:%d - %s() - \"", time_str, LEVEL_STRING[lvl], file, line, func);
     vfprintf(stream, fmt_string, args);
     fputc('"', stream);
     fputc('\n', stream);
-    funlockfile(stream);
+    //funlockfile(stream);
 }
