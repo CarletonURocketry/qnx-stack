@@ -80,7 +80,7 @@
     #######################################
     ## Start telemetry
     #######################################
-    sh etc/telemetry.sh
+    sh /etc/telemetry.sh
 }
 
 # Redirect console messages
