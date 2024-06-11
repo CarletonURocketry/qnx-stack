@@ -70,6 +70,8 @@
     display_msg Starting SDMMC driver for SD card (SDIO0)...
     #devb-sdmmc-bcm2711 mem name=below1G sdio addr=0xfe340000,irq=158,bs=bmstr_base=0xc0000000 disk name=sd
     devb-sdmmc-bcm2711 sdio addr=0xfe340000,irq=158 disk name=sd
+    waitfor /dev/sd0t12.1
+    mount -t dos /dev/sd0t12.1 /
 
     ###########################################################################
 	## Message queue server
