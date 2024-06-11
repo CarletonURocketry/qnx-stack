@@ -81,6 +81,9 @@
     ## Start telemetry
     #######################################
     sh /etc/telemetry.sh
+
+    # Drop into debug shell
+    [+session] ksh &
 }
 
 # Redirect console messages
