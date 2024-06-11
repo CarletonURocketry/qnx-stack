@@ -52,7 +52,7 @@
 
     display_msg "Starting serial driver (/dev/ser3) for UART3 at baud 57600"
     devc-serpl011 -b57600 -c48000000 -e -F -s -u3 0xfe201600,153
-    waitfor /dev/ser3 4
+    waitfor /dev/ser3 10
     # to use uart3 as console debug port, comment out line "reopen /dev/ser1" above, and uncomment line below
     #reopen /dev/ser3
 
@@ -82,16 +82,16 @@
     display_msg "Starting CU InSpace telemetry system..."
 
     display_msg "Starting fetcher..."
-    fetcher /dev/i2c1 2> /var/log/fetcher.log &
+    fetcher /dev/i2c1
 
     display_msg "Starting packager..."
-    packager VA3INI 2> /var/log/packager.log &
+    packager VA3INI
 
     display_msg "Starting plogger..."
-    plogger -o /var/log/red_ballistic.mission 2> /dev/null &
+    plogger -o /var/log/red_ballistic.mission
 
     display_msg "Starting broadcaster..."
-    broadcaster /dev/ser3 2> /var/log/broadcaster.log &
+    broadcaster /dev/ser3
 }
 
 # Redirect console messages
