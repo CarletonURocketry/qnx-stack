@@ -276,12 +276,15 @@ qnxuser:x:1000:qnxuser
 
     echo "Starting fetcher..."
     fetcher /dev/i2c1 2>> fetcher.log &
+    waitfor /dev/mqueue/fetcher/sensors 5
 
     echo "Starting packager..."
     packager VA3INI 2>> packager.log &
+    waitfor /dev/mqueue/packager-out 5
 
     echo "Starting plogger..."
     plogger -o red_ballistic.mission 2> plogger.log &
+    waitfor /dev/mqueue/plogger-out 5
 
     echo "Starting broadcaster..."
     broadcaster /dev/ser3 2>> broadcaster.log &
