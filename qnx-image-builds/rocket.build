@@ -265,6 +265,8 @@ qnxuser:x:1000:qnxuser
 /bin/touch=touch
 /bin/sh=sh
 /bin/ksh=ksh
+/bin/tail=tail
+/bin/head=head
 
 ###########################################################################
 ## TELEMETRY SYSTEM BINARIES
