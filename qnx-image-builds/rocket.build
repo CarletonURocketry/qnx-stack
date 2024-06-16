@@ -275,16 +275,16 @@ qnxuser:x:1000:qnxuser
     echo "Starting CU InSpace telemetry system..."
 
     echo "Starting fetcher..."
-    fetcher /dev/i2c1 2> fetcher.log &
+    fetcher /dev/i2c1 2>> fetcher.log &
 
     echo "Starting packager..."
-    packager VA3INI 2> packager.log &
+    packager VA3INI 2>> packager.log &
 
     echo "Starting plogger..."
     plogger -o red_ballistic.mission 2> plogger.log &
 
     echo "Starting broadcaster..."
-    broadcaster /dev/ser3 2> broadcaster.log &
+    broadcaster /dev/ser3 2>> broadcaster.log &
 }
 
 /bin/packager=packager
