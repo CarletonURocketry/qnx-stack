@@ -268,7 +268,7 @@ qnxuser:x:1000:qnxuser
 
 ###########################################################################
 ## TELEMETRY SYSTEM BINARIES
-## You will need to copy the compiled binaries to the prebuilt/aarch64lw/bin folder in this project
+## You will need to copy the compiled binaries to a directory called "telemetry"; a sibling directory of "images"
 ###########################################################################
 
 [perms=0777] /etc/telemetry.sh = {
@@ -287,10 +287,10 @@ qnxuser:x:1000:qnxuser
     broadcaster /dev/ser3 2>> broadcaster.log &
 }
 
-/bin/packager=packager
-/bin/fetcher=fetcher
-/bin/broadcaster=broadcaster
-/bin/plogger=plogger
+/bin/packager=../telemetry/packager
+/bin/fetcher=../telemetry/fetcher
+/bin/broadcaster=../telemetry/broadcaster
+/bin/plogger=../telemetry/plogger
 
 ###########################################################################
 ## END OF BUILD SCRIPT
